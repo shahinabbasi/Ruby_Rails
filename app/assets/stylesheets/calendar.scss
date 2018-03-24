@@ -1,0 +1,60 @@
+.box{
+  width: 130px;
+  height: 300px;
+  float: left;
+  margin-top: 1px;
+  margin-left: 5px;
+  padding: 4px;
+  padding-top: 1px;
+  border-bottom: .7px solid #ccc;
+  border-right: .7px solid #ccc;
+  background-color: #F2F2F2
+}
+
+.box1{
+  width: 400px;
+  height: 300px;
+  float: left;
+  margin-top: 1px;
+  margin-left: 5px;
+  padding: 4px;
+  padding-top: 1px;
+  border-bottom: .7px solid #ccc;
+  border-right: .7px solid #ccc;
+  background-color: #F2F2F2
+
+}
+
+.form {
+  align-self: center;
+  height:320px;
+  background:#CCCCCC;
+  padding: 20px;
+  max-width:600px;
+  margin:40px auto;
+  border-radius:4px;
+  box-shadow:0 4px 10px 4px rgba(#13232f,.3);
+  display: none;
+}
+
+.tab_cale{
+  display: block;
+  font-family: sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 115%;
+  overflow: 100%;
+  width: 100%;
+
+  th {
+    background-color: rgb(112, 196, 105);
+    color: white;
+    font-weight: normal;
+    padding: 20px 30px;
+    text-align: center;
+  }
+  td {
+    background-color: rgb(238, 238, 238);
+    color: rgb(111, 111, 111);
+    padding: 20px 30px;
+  }
+}

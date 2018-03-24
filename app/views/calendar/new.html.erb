@@ -1,0 +1,180 @@
+<% start_date = params.fetch(:start_date, Date.today).to_date %>
+<% date_range= (start_date.beginning_of_week..start_date.end_of_week).to_a %>
+
+<%= link_to  "previous", start_date: date_range.first - 1.day %>
+<%= link_to  "Next", start_date: date_range.last + 1.day %>
+
+
+<table  id="tab_cale" border="1">
+  <th style="width:500px" ><%= start_date.month %> <%= start_date.year   %></th>
+  <tr>
+    <td></td>
+    <td>1:00</td>
+    <td>2:00</td>
+    <td>3:00</td>
+    <td>4:00</td>
+    <td>5:00</td>
+    <td>6:00</td>
+    <td>7:00</td>
+    <td>8:00</td>
+    <td>9:00</td>
+    <td>10:00</td>
+    <td>11:00</td>
+    <td>12:00</td>
+    <td>13:00</td>
+    <td>14:00</td>
+    <td>15:00</td>
+    <td>16:00</td>
+    <td>17:00</td>
+    <td>18:00</td>
+    <td>19:00</td>
+    <td>20:00</td>
+    <td>21:00</td>
+    <td>22:00</td>
+    <td>23:00</td>
+    <td>24:00</td>
+  </tr>
+
+  <% date_range.each do |dd| %>
+      <% d_start=[] %>
+      <% d_end= []%>
+      <% id=[] %>
+      <% name=[] %>
+      <tr>
+        <td><%= dd.day %></td>
+        <% @calendar_all.each do |b| %>
+            <% if dd == b.date_define %>
+                <% d_start.push(b.start_time.strftime("%H").to_i )%>
+                <% d_end.push(b.end_time.strftime("%H").to_i) %>
+                <% id.push(b.id) %>
+                <% name.push(b.description)%>
+               <% end %>
+        <% end %>
+
+        <% for d in 1..24 %>
+            <% if d_start.include?(d)  %>
+              <% c=d_start.find_index(d) %>
+            <%end%>
+            <% if  c && (d >= d_start[c] && d <= d_end[c]) %>
+                 <td id='<%= dd %>'> <%= link_to name[c][0..4],new_calendar_path(:id => id[c]) ,style:"background:red"  %></td>
+            <%else %>
+                <td id='<%= dd %>' ><button onclick="function1()"  style="height:23px"></button></td>
+            <%end%>
+         <%end%>
+
+      </tr>
+  <% end %>
+</table>
+
+<% if @calendar_find%><script>function2()</script><%end%>
+<script>
+  function function1(){
+    var c = document.getElementById("tab_cale");
+    for (var i = 0; i < c.rows.length; i++) {
+      for (var j = 0; j < c.rows[i].cells.length; j++)
+        c.rows[i].cells[j].onclick = function (cell) {
+          document.getElementById("news").value = this.id;
+          document.getElementById("news").readOnly  = true;
+          document.getElementById("save").checked = true;
+          document.getElementById("Modification").disabled = true;
+          document.getElementById("Remove").disabled = true;
+        };
+    }
+     document.getElementById("div_f").style.display = "block";
+  }
+  function function2(){
+    document.getElementById("save").disabled = true;
+    document.getElementById("Modification").checked = true;
+    document.getElementById("div_f").style.display = "block";
+  }
+  function function3(){
+    document.getElementById("update_sec").style.display = "none";
+    document.getElementById("remove_sec").style.display = "block";
+  }
+  function function4(){
+    document.getElementById("update_sec").style.display = "block";
+    document.getElementById("remove_sec").style.display = "none";
+  }
+</script>
+
+
+<div  id="div_f" class="form">
+  <div class="box" >
+      <input style="font-size: 13px" type="radio"  id="save"         name="Modifi" value="Save"> Save<br><br>
+      <input style="font-size: 13px" type="radio"  id="Modification" onchange="function4()" name="Modifi" value="Modification"> Modification<br><br>
+      <input style="font-size: 13px" type="radio"  id="Remove"    onchange="function3()"   name="Modifi" value="Remove"> Remove
+  </div>
+  <% if @calendar_find%>
+  <div class="box1" id="remove_sec" style="display:none"  >
+    <p>Descreption : <%= @calendar_find.description %></p>
+    <p>Time : From <%=@calendar_find.start_time.strftime("%H")%>:00 To <%=@calendar_find.end_time.strftime("%H")%>:00  </p>
+    <p>Date : <%=@calendar_find.date_define%></p>
+    <br><br><br><br><br><br><br>
+    <hr>
+    <%= link_to  '<button type="button">Remove</button>'.html_safe,calendar_path(@calendar_find.id), :method=> "DELETE", :data =>{:confirm => 'You have to delete this date of appointment?'} ,style:"font-size:13px;background:red"  %>
+    <%= link_to  '<button type="button">Cancel</button>'.html_safe, new_calendar_path ,style:"font-size:13px;background:red"  %>
+  </div>
+      <%end%>
+  <% if !@calendar_find%>
+  <div class="box1" id="insert_sec" >
+    <%= form_for @calendar,id:"insert_", url:{action: "create"} do |f| %>
+        <p>
+          <%= f.label :description %>
+          <%= f.text_field :description %>
+        </p>
+        <p>
+          <%= f.label :start_time %>
+          <% @option = options_for_select([[],['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['7','7'],['8','8'],['9','9'],['10','10'],[11,'11'],['12','12'],['13','13'],['14','14'],['15','15'],['16','16'],['17','17'],['18','18'],['19','19'],['20','20'],['21','21'],['22','22'],['23','23'],['24','24']],@calendar.start_time )%>
+          <%= f.select(:start_time,@option )%>
+
+        </p>
+        <p>
+          <%= f.label :end_time %>
+          <% @option = options_for_select([[],['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['7','7'],['8','8'],['9','9'],['10','10'],[11,'11'],['12','12'],['13','13'],['14','14'],['15','15'],['16','16'],['17','17'],['18','18'],['19','19'],['20','20'],['21','21'],['22','22'],['23','23'],['24','24']],@calendar.end_time )%>
+          <%= f.select(:end_time,@option )%>
+        </p>
+        <p>
+          <%= f.label :date_define %>
+          <%= f.text_field  :date_define ,id:"news" %>
+        </p>
+        <p>
+          <br><br><br><br>
+        <hr>
+          <%= f.submit("Save") %>     <%= link_to  '<button type="button">Cancel</button>'.html_safe, new_calendar_path ,style:"font-size:13px;background:red"  %>
+
+        </p>
+    <% end %>
+  </div>
+  <% end %>
+  <% if @calendar_find%>
+  <div class="box1" id="update_sec" >
+
+        <%= form_for @calendar, url: calendar_path(:id=>@calendar_find.id), :method=> "put"   do |f| %>
+            <p>
+              <%= f.label :description %>
+              <%= f.text_field :description, value:@calendar_find.description  %>
+            </p>
+            <p>
+              <%= f.label :start_time %>
+              <% @option = options_for_select([[@calendar_find.start_time.strftime("%H").to_i],['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['7','7'],['8','8'],['9','9'],['10','10'],[11,'11'],['12','12'],['13','13'],['14','14'],['15','15'],['16','16'],['17','17'],['18','18'],['19','19'],['20','20'],['21','21'],['22','22'],['23','23'],['24','24']],@calendar.start_time )%>
+              <%= f.select(:start_time,@option )%>
+
+            </p>
+            <p>
+              <%= f.label :end_time %>
+              <% @option = options_for_select([[@calendar_find.end_time.strftime("%H").to_i],['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['7','7'],['8','8'],['9','9'],['10','10'],[11,'11'],['12','12'],['13','13'],['14','14'],['15','15'],['16','16'],['17','17'],['18','18'],['19','19'],['20','20'],['21','21'],['22','22'],['23','23'],['24','24']],@calendar.end_time )%>
+              <%= f.select(:end_time,@option )%>
+            </p>
+            <p>
+              <%= f.label :date_define %>
+              <%= f.text_field  :date_define, value:@calendar_find.date_define %>
+            </p>
+            <p>
+              <br><br><br><br>
+             <hr>
+              <%= f.submit("update") %>     <%= link_to  '<button type="button">Cancel</button>'.html_safe, new_calendar_path ,style:"font-size:13px;background:red"  %>
+            </p>
+        <% end %>
+  </div>
+    <%end%>
+</div>
